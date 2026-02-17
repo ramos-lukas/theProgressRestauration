@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>La Carte — The Progress Restauration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1a1208;
+      --parchment: #f5efe4;
+      --cream: #faf6ee;
+      --gold: #b8922a;
+      --gold-light: #d4a84b;
+      --gold-pale: #f0dfa8;
+      --rust: #8b3a1e;
+      --sage: #4a5e45;
+      --separator: #c9a96a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: var(--cream);
+      color: var(--ink);
+      font-family: 'Cormorant Garamond', serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── TEXTURE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* ─── BORDER FRAME ─── */
+    .page-frame {
+      position: fixed;
+      inset: 18px;
+      border: 1px solid var(--separator);
+      pointer-events: none;
+      z-index: 50;
+    }
+    .page-frame::before {
+      content: '';
+      position: absolute;
+      inset: 5px;
+      border: 1px solid var(--gold-pale);
+      pointer-events: none;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      position: relative;
+      text-align: center;
+      padding: 72px 40px 48px;
+      background: linear-gradient(180deg, #1a1208 0%, #2d1f0a 60%, var(--cream) 100%);
+      overflow: hidden;
+    }
+
+    .header-ornament {
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 200;
+      font-size: 10px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      opacity: 0.8;
+      margin-bottom: 18px;
+      animation: fadeDown 0.8s ease both;
+    }
+
+    .restaurant-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 400;
+      color: var(--parchment);
+      line-height: 1.05;
+      letter-spacing: -0.5px;
+      animation: fadeDown 0.9s ease 0.1s both;
+    }
+
+    .restaurant-name em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    .header-tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 300;
+      font-style: italic;
+      color: rgba(245,239,228,0.6);
+      margin-top: 14px;
+      letter-spacing: 1px;
+      animation: fadeDown 0.9s ease 0.2s both;
+    }
+
+    .gold-rule {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 32px auto 0;
+      max-width: 320px;
+      animation: fadeDown 0.9s ease 0.3s both;
+    }
+    .gold-rule::before,
+    .gold-rule::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold));
+    }
+    .gold-rule::after {
+      background: linear-gradient(90deg, var(--gold), transparent);
+    }
+    .gold-rule-diamond {
+      width: 8px;
+      height: 8px;
+      background: var(--gold);
+      transform: rotate(45deg);
+    }
+
+    /* ─── MAIN LAYOUT ─── */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 40px 80px;
+    }
+
+    /* ─── CATEGORY SECTION ─── */
+    .menu-section {
+      margin-top: 60px;
+      animation: fadeUp 0.7s ease both;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 36px;
+    }
+
+    .section-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 4.5rem;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--gold-pale);
+      line-height: 1;
+      flex-shrink: 0;
+      letter-spacing: -2px;
+    }
+
+    .section-title-block {
+      flex: 1;
+      border-top: 1px solid var(--separator);
+      padding-top: 12px;
+    }
+
+    .section-label {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 9px;
+      font-weight: 300;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 5px;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 500;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    /* ─── SUBCATEGORY ─── */
+    .subcategory {
+      margin-bottom: 44px;
+    }
+
+    .subcategory-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .subcategory-title {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--rust);
+    }
+
+    .subcategory-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--rust), transparent);
+      opacity: 0.3;
+    }
+
+    /* ─── MENU ITEM ─── */
+    .menu-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: baseline;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(201,169,106,0.2);
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .menu-item:hover::before {
+      content: '';
+      position: absolute;
+      left: -16px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--gold);
+    }
+
+    .item-left {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .item-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: var(--ink);
+      line-height: 1.3;
+    }
+
+    .item-desc {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.92rem;
+      font-style: italic;
+      color: rgba(26,18,8,0.5);
+      font-weight: 300;
+    }
+
+    .item-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--gold);
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+    }
+
+    /* ─── BADGE SIGNATURE ─── */
+    .badge-signature {
+      display: inline-block;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 7px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--rust);
+      border: 1px solid var(--rust);
+      padding: 2px 6px;
+      margin-left: 8px;
+      vertical-align: middle;
+      opacity: 0.8;
+    }
+
+    /* ─── DRINKS GRID ─── */
+    .drinks-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 40px;
+    }
+
+    @media (max-width: 640px) {
+      .drinks-grid { grid-template-columns: 1fr; }
+      .section-number { font-size: 3rem; }
+    }
+
+    /* ─── DESSERTS GRID ─── */
+    .desserts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .dessert-card {
+      background: var(--parchment);
+      border: 1px solid rgba(201,169,106,0.35);
+      padding: 22px 20px;
+      position: relative;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .dessert-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(26,18,8,0.1);
+    }
+
+    .dessert-card::before {
+      content: '✦';
+      position: absolute;
+      top: -9px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      color: var(--gold);
+      background: var(--cream);
+      padding: 0 6px;
+    }
+
+    .dessert-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 6px;
+      font-style: italic;
+    }
+
+    .dessert-price {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--gold);
+      letter-spacing: 2px;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      text-align: center;
+      padding: 40px 40px 60px;
+      border-top: 1px solid rgba(201,169,106,0.3);
+      margin-top: 20px;
+    }
+
+    .footer-note {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.85rem;
+      font-style: italic;
+      color: rgba(26,18,8,0.4);
+      letter-spacing: 0.5px;
+    }
+
+    .footer-reservation {
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 300;
+      letter-spacing: 3px;
+      color: rgba(26,18,8,0.5);
+      margin-top: 14px;
+      text-transform: uppercase;
+    }
+
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-style: italic;
+      color: var(--gold);
+      opacity: 0.4;
+      margin-top: 16px;
+    }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .menu-section:nth-child(1) { animation-delay: 0.1s; }
+    .menu-section:nth-child(2) { animation-delay: 0.25s; }
+    .menu-section:nth-child(3) { animation-delay: 0.4s; }
+  </style>
+</head>
+<body>
+
+<div class="page-frame"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-ornament">✦ Établissement depuis 2018 ✦</div>
+  <h1 class="restaurant-name"><em>The</em> Progress Restauration</h1>
+  <p class="header-tagline">Cuisine de brasserie & saveurs du monde</p>
+  <div class="gold-rule"><div class="gold-rule-diamond"></div></div>
+</header>
+
+<main>
+
+  <!-- ══════════════ SECTION 1 — PLATS PRINCIPAUX ══════════════ -->
+  <section class="menu-section">
+    <div class="section-header">
+      <span class="section-number">01</span>
+      <div class="section-title-block">
+        <div class="section-label">Notre sélection</div>
+        <div class="section-title">Plats Principaux</div>
+      </div>
+    </div>
+
+    <!-- Nouilles sautées -->
+    <div class="subcategory">
+      <div class="subcategory-header">
+        <span class="subcategory-title">Nouilles sautées</span>
+        <div class="subcategory-line"></div>
+      </div>
+      <div class="menu-item">
+        <div class="item-left">
+          <span class="item-name">Nouilles au bœuf</span>
+          <span class="item-desc">Sautées avec oignons caramélisés</span>
+        </div>
+        <span class="item-price">14,90 €</span>
+      </div>
+      <div class="menu-item">
+        <div class="item-left">
+          <span class="item-name">Nouilles au poulet</span>
+          <span class="item-desc">Légumes croquants de saison</span>
+        </div>
+        <span class="item-price">13,50 €</span>
+      </div>
+      <div class="menu-item">
+        <div class="item-left">
+          <span class="item-name">Nouilles végétariennes</span>
+          <span class="item-desc">Tofu et sauce soja</span>
+        </div>
+        <span class="item-price">12,90 €</span>
+      </div>
+    </div>
+
+    <!-- Burgers gourmets -->
+    <div class="subcategory">
+      <div class="subcategory-header">
+        <span class="subcategory-title">Burgers gourmets</span>
+        <div class="subcategory-line"></div>
+      </div>
+      <div class="menu-item">
+        <div class="item-left">
+          <span class="item-name">Burger Raclette</span>
+          <span class="item-desc">Bœuf, raclette fondue</span>
+        </div>
+        <span class="item-price">15,90 €</span>
+      </div>
+      <div class="menu-item">
+        <div class="item-left">
+          <span class="item-name">Burger Classique</span>
+          <span class="item-desc">Bœuf, cheddar et cornichons</span>
+        </div>
+        <span class="item-price">14,50 €</span>
+      </div>
+      <div class="menu-item">
+        <div class="item-left">
+          <span class="item-name">Burger Poulet BBQ</span>
+          <span class="item-desc">Poulet croustillant, sauce BBQ maison</span>
+        </div>
+        <span class="item-price">13,90 €</span>
+      </div>
+      <div class="menu-item">
+        <div class="item-left">
+          <span class="item-name">Burger Végétarien</span>
+          <span class="item-desc">Légumes grillés, sauce basilic</span>
+        </div>
+        <span class="item-price">12,90 €</span>
+      </div>
+    </div>
+
+    <!-- Risottos -->
+    <div class="subcategory">
+      <div class="subcategory-header">
+        <span class="subcategory-title">Risottos</span>
+        <div class="subcategory-line"></div>
+      </div>
+      <div class="menu-item">
+        <div class="item-left">
+          <span class="item-name">Risotto Truffe</span>
+          <span class="item-desc">Champignons et huile de truffe</span>
+        </div>
+        <span class="item-price">16,90 €</span>
+      </div>
+      <div class="menu-item">
+        <div class="item-left">
+          <span class="item-name">Risotto Fruits de Mer</span>
+          <span class="item-desc">Citron vert et coquillages</span>
+        </div>
+        <span class="item-price">17,50 €</span>
+      </div>
+      <div class="menu-item">
+        <div class="item-left">
+          <span class="item-name">Risotto Safran</span>
+          <span class="item-desc">Safran et parmesan AOP</span>
+        </div>
+        <span class="item-price">15,90 €</span>
+      </div>
+    </div>
+
+    <!-- Tacos maison -->
+    <div class="subcategory">
+      <div class="subcategory-header">
+        <span class="subcategory-title">Tacos maison</span>
+        <div class="subcategory-line"></div>
+      </div>
+      <div class="menu-item">
+        <div class="item-left">
+          <span class="item-name">Tacos Bœuf</span>
+          <span class="item-desc">Marinade maison et fromage fondu</span>
+        </div>
+        <span class="item-price">11,90 €</span>
+      </div>
+      <div class="menu-item">
+        <div class="item-left">
+          <span class="item-name">Tacos Poulet Épicé</span>
+          <span class="item-desc">Guacamole frais</span>
+        </div>
+        <span class="item-price">11,50 €</span>
+      </div>
+      <div class="menu-item">
+        <div class="item-left">
+          <span class="item-name">Tacos Végétariens</span>
+          <span class="item-desc">Haricots noirs et avocat</span>
+        </div>
+        <span class="item-price">10,90 €</span>
+      </div>
+    </div>
+
+    <!-- Plats signatures -->
+    <div class="subcategory">
+      <div class="subcategory-header">
+        <span class="subcategory-title">Plats signatures</span>
+        <div class="subcategory-line"></div>
+      </div>
+      <div class="menu-item">
+        <div class="item-left">
+          <span class="item-name">Magret de Canard <span class="badge-signature">Chef</span></span>
+          <span class="item-desc">Sauce miel et figues fraîches</span>
+        </div>
+        <span class="item-price">22,90 €</span>
+      </div>
+      <div class="menu-item">
+        <div class="item-left">
+          <span class="item-name">Pavé de Saumon <span class="badge-signature">Chef</span></span>
+          <span class="item-desc">Grillé, purée de patates douces</span>
+        </div>
+        <span class="item-price">19,50 €</span>
+      </div>
+      <div class="menu-item">
+        <div class="item-left">
+          <span class="item-name">Filet Mignon de Porc <span class="badge-signature">Chef</span></span>
+          <span class="item-desc">Aux champignons forestiers</span>
+        </div>
+        <span class="item-price">20,90 €</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ SECTION 2 — BOISSONS ══════════════ -->
+  <section class="menu-section">
+    <div class="section-header">
+      <span class="section-number">02</span>
+      <div class="section-title-block">
+        <div class="section-label">À la carte</div>
+        <div class="section-title">Boissons</div>
+      </div>
+    </div>
+
+    <div class="drinks-grid">
+      <!-- Softs -->
+      <div class="subcategory">
+        <div class="subcategory-header">
+          <span class="subcategory-title">Softs</span>
+          <div class="subcategory-line"></div>
+        </div>
+        <div class="menu-item">
+          <div class="item-left">
+            <span class="item-name">Coca-Cola</span>
+            <span class="item-desc">33 cl</span>
+          </div>
+          <span class="item-price">3,50 €</span>
+        </div>
+        <div class="menu-item">
+          <div class="item-left">
+            <span class="item-name">Coca-Cola Zéro</span>
+            <span class="item-desc">33 cl</span>
+          </div>
+          <span class="item-price">3,50 €</span>
+        </div>
+        <div class="menu-item">
+          <div class="item-left">
+            <span class="item-name">Sprite</span>
+            <span class="item-desc">33 cl</span>
+          </div>
+          <span class="item-price">3,50 €</span>
+        </div>
+        <div class="menu-item">
+          <div class="item-left">
+            <span class="item-name">Ice Tea Pêche</span>
+            <span class="item-desc">33 cl</span>
+          </div>
+          <span class="item-price">3,50 €</span>
+        </div>
+        <div class="menu-item">
+          <div class="item-left">
+            <span class="item-name">Eau Plate</span>
+            <span class="item-desc">50 cl</span>
+          </div>
+          <span class="item-price">2,50 €</span>
+        </div>
+        <div class="menu-item">
+          <div class="item-left">
+            <span class="item-name">Eau Gazeuse</span>
+            <span class="item-desc">50 cl</span>
+          </div>
+          <span class="item-price">2,90 €</span>
+        </div>
+        <div class="menu-item">
+          <div class="item-left">
+            <span class="item-name">Jus d'Orange Pressé</span>
+            <span class="item-desc">25 cl, fraîchement pressé</span>
+          </div>
+          <span class="item-price">4,50 €</span>
+        </div>
+      </div>
+
+      <!-- Bières artisanales -->
+      <div class="subcategory">
+        <div class="subcategory-header">
+          <span class="subcategory-title">Bières artisanales</span>
+          <div class="subcategory-line"></div>
+        </div>
+        <div class="menu-item">
+          <div class="item-left">
+            <span class="item-name">Blonde Locale</span>
+            <span class="item-desc">33 cl – brasserie régionale</span>
+          </div>
+          <span class="item-price">5,90 €</span>
+        </div>
+        <div class="menu-item">
+          <div class="item-left">
+            <span class="item-name">Ambrée</span>
+            <span class="item-desc">33 cl – ronde et maltée</span>
+          </div>
+          <span class="item-price">6,50 €</span>
+        </div>
+        <div class="menu-item">
+          <div class="item-left">
+            <span class="item-name">IPA</span>
+            <span class="item-desc">33 cl – houblonnée et aromatique</span>
+          </div>
+          <span class="item-price">6,90 €</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ SECTION 3 — DESSERTS ══════════════ -->
+  <section class="menu-section">
+    <div class="section-header">
+      <span class="section-number">03</span>
+      <div class="section-title-block">
+        <div class="section-label">Pour finir en beauté</div>
+        <div class="section-title">Desserts</div>
+      </div>
+    </div>
+
+    <div class="desserts-grid">
+      <div class="dessert-card">
+        <div class="dessert-name">Moelleux au Chocolat</div>
+        <div class="item-desc" style="margin: 4px 0 12px; font-size: 0.88rem;">Cœur coulant, servi tiède</div>
+        <div class="dessert-price">7,90 €</div>
+      </div>
+      <div class="dessert-card">
+        <div class="dessert-name">Tartelette Citron Meringuée</div>
+        <div class="item-desc" style="margin: 4px 0 12px; font-size: 0.88rem;">Meringue italienne soufflée</div>
+        <div class="dessert-price">6,90 €</div>
+      </div>
+      <div class="dessert-card">
+        <div class="dessert-name">Panna Cotta Vanille</div>
+        <div class="item-desc" style="margin: 4px 0 12px; font-size: 0.88rem;">Coulis de fruits rouges</div>
+        <div class="dessert-price">6,50 €</div>
+      </div>
+      <div class="dessert-card">
+        <div class="dessert-name">Cheesecake Spéculoos</div>
+        <div class="item-desc" style="margin: 4px 0 12px; font-size: 0.88rem;">Base biscuitée croustillante</div>
+        <div class="dessert-price">7,50 €</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p class="footer-note">Prix TTC service compris · Merci de signaler toute allergie à votre serveur</p>
+  <p class="footer-reservation">Réservations : <a href="tel:+18579715590" style="color: var(--gold); text-decoration: none; letter-spacing: 1px;">+1 857 971 5590</a></p>
+  <p class="footer-logo">The Progress Restauration</p>
+</footer>
+
+</body>
+</html>
